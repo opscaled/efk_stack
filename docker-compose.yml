@@ -1,0 +1,36 @@
+version: '2'
+
+services:
+  fluentd:
+    build: fluentd/
+    container_name: fluentd
+    ports:
+      - '24224:24224'
+    networks:
+      - efk
+    restart: always
+
+  elasticsearch:
+    image: elasticsearch:2.2
+    container_name: elasticsearch
+    command: elasticsearch -Des.network.host=0.0.0.0
+    volumes:
+      - ./elasticsearch/data:/usr/share/elasticsearch/data
+    networks:
+      - efk
+    restart: always
+
+  kibana:
+    build: kibana/
+    container_name: kibana
+    volumes:
+      - ./kibana/config/kibana.yml:/opt/kibana/config/kibana.yml
+    ports:
+      - '5601:5601'
+    networks:
+      - efk
+    restart: always
+
+networks:
+  efk:
+    driver: bridge
